@@ -1,5 +1,5 @@
 import random
-from blackjack.cards import Card
+from core.cards import Card
 
 class Deck:
     def __init__(self, num_decks: int = 1):

@@ -1,5 +1,5 @@
 import random
-from blackjack.deck import Deck
+from core.cards import Card
 
 class Hand:
     def __init__(self):
@@ -51,3 +51,7 @@ class Hand:
         # If there are two or more two valid values it means that at least one ace can be 11, therefore is soft
         valid = [v for v in self.values if v <= 21] # Only append valid values
         return len(valid) > 1
+    
+    @property
+    def top_card_value(self) -> int:
+        return self.cards[0].value
