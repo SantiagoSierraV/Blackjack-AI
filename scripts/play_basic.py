@@ -1,8 +1,5 @@
-from env import Blackjack_Env, Action
-import random
-
-def random_action() -> Action:
-    return random.choice([Action.HIT, Action.STAND])
+from env import Blackjack_Env
+from strategies import BasicStrategyAgent
 
 def print_hands(env):
     print(f"Dealer: {env.dealer_hand.cards[0]}")    
@@ -10,19 +7,23 @@ def print_hands(env):
 
 def main():
     blackjack_env = Blackjack_Env()
+    basic_strategy_agent = BasicStrategyAgent()
 
     episodes = 1000000
     total_reward = 0
 
-    for _ in range(episodes):
-        _state = blackjack_env.reset()
+    for episode in range(1, episodes+1):
+        state = blackjack_env.reset()
         done = False
 
         while not done:
-            action = random_action()
-            _state, done, reward = blackjack_env.step(action)
+            action = basic_strategy_agent.act(state)
+            state, done, reward = blackjack_env.step(action)
 
         total_reward += reward
+
+        if (episode) % (episodes/10) == 0:
+            print(f'Episode {episode} completed')
 
     print(f'Average reward over {episodes} episodes: {total_reward/episodes}')
 
