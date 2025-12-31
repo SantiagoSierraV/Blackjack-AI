@@ -84,8 +84,8 @@ class Blackjack_Env:
         return 0.0
 
     def _get_state(self) -> dict:
-        return {
-            'player_best': self.player_hand.best_value,
-            'player_is_soft': self.player_hand.is_soft,
-            'dealer_upcard': self.dealer_hand.top_card_value
-        }
+        return (
+            self.player_hand.best_value,    # Player's best value
+            self.player_hand.is_soft,       # Is the player soft
+            self.dealer_hand.top_card_value # Dealer's top card value
+        )

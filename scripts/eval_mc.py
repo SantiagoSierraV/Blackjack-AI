@@ -1,13 +1,10 @@
 from env import Blackjack_Env
-from strategies import BasicStrategyAgent
-
-def print_hands(env):
-    print(f"Dealer: {env.dealer_hand.cards[0]}")    
-    print(f"Player: {env.player_hand.cards} (value={env.player_hand.best_value})")
+from agents import MonteCarloAgent
 
 def main():
     blackjack_env = Blackjack_Env()
-    basic_strategy_agent = BasicStrategyAgent()
+    agent = MonteCarloAgent()
+    agent.load('checkpoints/mc_q_5M.pkl')
 
     episodes = 1000000
     total_reward = 0
@@ -17,12 +14,12 @@ def main():
         done = False
 
         while not done:
-            action = basic_strategy_agent.act(state)
+            action = agent.act(state, explore=False)
             state, done, reward = blackjack_env.step(action)
 
         total_reward += reward
 
-        if (episode) % (episodes/10) == 0:
+        if episode % (episodes/10) == 0:
             print(f'Episode {episode} completed')
 
     print(f'Average reward over {episodes} episodes: {total_reward/episodes}')

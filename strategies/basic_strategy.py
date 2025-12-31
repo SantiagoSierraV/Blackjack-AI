@@ -29,9 +29,7 @@ SOFT_TOTALS = {20: {2: 'S', 3: 'S', 4: 'S', 5: 'S', 6: 'S', 7: 'S', 8: 'S', 9: '
 
 class BasicStrategyAgent():
     def act(self, state):
-        player_best = state['player_best']
-        player_is_soft = state['player_is_soft']
-        dealer_upcard = state['dealer_upcard']
+        player_best, player_is_soft, dealer_upcard = state
 
         if player_is_soft:
             if player_best == 21:
