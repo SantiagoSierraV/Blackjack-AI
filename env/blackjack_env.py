@@ -47,6 +47,22 @@ class Blackjack_Env:
             self.done = True
             self._play_dealer()
             return self._get_state(), self.done, self._resolve_round()
+        
+        if action == Action.DOUBLE:
+            if not self.player_hand.can_double:
+                raise RuntimeError("Illegal Double")
+            
+            # Hit section
+            self.player_hand.add_card(self.deck.draw())
+
+            if self.player_hand.is_bust:
+                self.done = True
+                return self._get_state(), self.done, -2.0
+            
+            # Stand section
+            self.done = True
+            self._play_dealer()
+            return self._get_state(), self.done, 2*self._resolve_round()   
 
 
     def _play_dealer(self) -> None:
@@ -87,5 +103,6 @@ class Blackjack_Env:
         return (
             self.player_hand.best_value,    # Player's best value
             self.player_hand.is_soft,       # Is the player soft
+            self.player_hand.can_double,    # Can the player double
             self.dealer_hand.top_card_value # Dealer's top card value
         )

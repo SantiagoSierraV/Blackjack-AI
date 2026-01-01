@@ -15,19 +15,21 @@ class QLearningAgent:
         self.returns_count = defaultdict(int)
 
     def act(self, state: tuple, explore: bool = True) -> Action:
+        # Get legal action for state
+        legal_actions = [Action.HIT, Action.STAND]
+        if state[2]:
+            legal_actions.append(Action.DOUBLE)
+
         # Explore
         if random.random() < self.epsilon and explore:
-            return random.choice([Action.HIT, Action.STAND])
+            return random.choice(legal_actions)
         
         # Exploit
-        q_hit = self.Q[(state, Action.HIT)]
-        q_stand = self.Q[(state, Action.STAND)]
+        best_q = max(self.Q[(state, a)] for a in legal_actions)   # Best q value
+        best_actions = [a for a in legal_actions if self.Q[(state, a)] == best_q] # Add the action if is equal to the best q value
 
-        # Look at the learned values (if not seen they are equal to 0), then choose the better action
-        # If they are the same, choose a random action
-        if q_hit == q_stand:
-            return random.choice([Action.HIT, Action.STAND])
-        return Action.HIT if q_hit > q_stand else Action.STAND
+        # This adds unbiased tie-breaking
+        return random.choice(best_actions)
     
     def update(self, state, action, reward, next_state, done):
         self.returns_count[(state, action)] += 1

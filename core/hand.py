@@ -53,5 +53,10 @@ class Hand:
         return len(valid) > 1
     
     @property
+    def can_double(self) -> bool:
+        # True if there is only two cards in hand
+        return len(self.cards) == 2
+
+    @property
     def top_card_value(self) -> int:
         return self.cards[0].value
