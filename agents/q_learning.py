@@ -3,8 +3,9 @@ from collections import defaultdict
 import random
 import pickle
 
-class MonteCarloAgent:
-    def __init__(self, epsilon: float = 0.1):
+class QLearningAgent:
+    def __init__(self, gamma: float = 1.0, epsilon: float = 0.1):
+        self.gamma = gamma
         self.epsilon = epsilon
 
         # We use defaultdict so it returns 0.0 when the key doesn't exist
@@ -23,26 +24,31 @@ class MonteCarloAgent:
         q_stand = self.Q[(state, Action.STAND)]
 
         # Look at the learned values (if not seen they are equal to 0), then choose the better action
-        # If equal, stand
+        # If they are the same, choose a random action
+        if q_hit == q_stand:
+            return random.choice([Action.HIT, Action.STAND])
         return Action.HIT if q_hit > q_stand else Action.STAND
     
-    def update(self, episode, reward):
-        
-        visited = set() # Update each (state, action) once per episode
+    def update(self, state, action, reward, next_state, done):
+        self.returns_count[(state, action)] += 1
+        alpha = 1.0 / self.returns_count[(state, action)]
 
-        for state, action in episode:
-            if (state, action) in visited:  # If the the pair was already updated in the episode, then skip it
-                continue
+        current = self.Q[(state, action)]
 
-            visited.add((state, action))
+        if done:
+            # If the episode ended the target will be the reward, since there is no future states
+            target = reward
+        else:
+            # Best possible future in the next state
+            next_q = max(
+                self.Q[(next_state, a)]
+                for a in Action
+            )
+            # Bellman equation, gamma is 1.0, because episodes are finite and rewards are only at terminal
+            target = reward + self.gamma * next_q
 
-            self.returns_count[(state, action)] += 1    # Add one to the amount of visited times
-
-            # Learning rate, fist update: α = 1.0, second: α = 0.5, third: α = 0.33
-            alpha = 1 / self.returns_count[(state, action)]
-
-            # Then Q is set to the average of all observed rewards
-            self.Q[(state, action)] += alpha * (reward - self.Q[(state, action)])
+        # Moving averge
+        self.Q[(state, action)] += alpha * (target - current)
 
     # Save the Q values
     def save(self, path: str):
